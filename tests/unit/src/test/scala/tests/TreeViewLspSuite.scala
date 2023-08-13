@@ -28,11 +28,10 @@ class TreeViewLspSuite extends BaseLspSuite("tree-view") {
     val otherLibraries = SortedSet(
       "cats-core_2.13", "cats-kernel_2.13", "checker-qual", "circe-core_2.13",
       "circe-numbers_2.13", "error_prone_annotations", "failureaccess", "gson",
-      "guava", "j2objc-annotations", "jsr305", "listenablefuture",
-      "org.eclipse.lsp4j", "org.eclipse.lsp4j.generator",
-      "org.eclipse.lsp4j.jsonrpc", "org.eclipse.xtend.lib",
-      "org.eclipse.xtend.lib.macro", "org.eclipse.xtext.xbase.lib",
-      "scala-library", "scala-reflect", "semanticdb-javac",
+      "guava", "j2objc-annotations", "jsr305", "org.eclipse.lsp4j",
+      "org.eclipse.lsp4j.generator", "org.eclipse.lsp4j.jsonrpc",
+      "org.eclipse.xtend.lib", "org.eclipse.xtend.lib.macro",
+      "org.eclipse.xtext.xbase.lib", "scala-library", "scala-reflect",
       "simulacrum-scalafix-annotations_2.13", "sourcecode_2.13",
     )
 
@@ -44,8 +43,8 @@ class TreeViewLspSuite extends BaseLspSuite("tree-view") {
   }
 
   lazy val expectedLibrariesString: String =
-    this.expectedLibraries.toVector
-      .map((s: String) => s"${s}.jar -")
+    (this.expectedLibraries.toVector
+      .map((s: String) => s"${s}.jar -") :+ "src.zip -")
       .mkString("\n")
 
   lazy val expectedLibrariesCount: Int =

@@ -51,6 +51,36 @@ class SymbolIndexBucket(
 
   def close(): Unit = sourceJars.close()
 
+  def defintionsAt(path: AbsolutePath): List[SymbolDefinition] = {
+    // TODO check if indexed, use toplevel otherwise
+    if (path.isSourcesJar)
+      addSourceJar(path).foreach { case (_, file) =>
+        // indexes fully
+        addMtagsSourceFile(file)
+      }
+    definitions
+      .collect {
+        // TODO optimize locations, put that in key?
+        case (sym, loc) =>
+          def isInJar(filePath: AbsolutePath) = {
+            filePath.toNIO.getFileSystem().toString() == path.toString()
+          }
+          loc.collect {
+            case SymbolLocation(symbolPath, range) if isInJar(symbolPath) =>
+              SymbolDefinition(
+                Symbol("_empty_"),
+                Symbol(sym),
+                path,
+                dialect,
+                range
+              )
+          }
+
+      }
+      .flatten
+      .toList
+  }
+
   def addSourceDirectory(dir: AbsolutePath): List[(String, AbsolutePath)] = {
     if (sourceJars.addEntry(dir.toNIO)) {
       dir.listRecursive.toList.flatMap {
@@ -292,6 +322,7 @@ class SymbolIndexBucket(
       docs: s.TextDocuments
   ): Unit = {
     docs.documents.foreach { document =>
+      // TODO maybe index symbol
       document.occurrences.foreach { occ =>
         if (occ.symbol.isGlobal && occ.role.isDefinition) {
           val acc = definitions.getOrElse(occ.symbol, Set.empty)
