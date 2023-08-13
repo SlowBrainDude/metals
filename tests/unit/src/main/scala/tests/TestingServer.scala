@@ -1752,12 +1752,12 @@ final case class TestingServer(
   }
 
   def jar(filename: String): String = {
-    server.buildTargets.allWorkspaceJars
+    server.buildTargets.allSourceJars
       .find(_.filename.contains(filename))
       .map(_.toURI.toString())
       .getOrElse {
         val alternatives =
-          server.buildTargets.allWorkspaceJars
+          server.buildTargets.allSourceJars
             .map(_.filename)
             .mkString(" ")
         throw new NoSuchElementException(

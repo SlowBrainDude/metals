@@ -37,6 +37,11 @@ trait GlobalSymbolIndex {
 
   def definitions(symbol: mtags.Symbol): List[SymbolDefinition]
 
+  def definitionsAt(
+      path: AbsolutePath,
+      dialect: Dialect
+  ): List[SymbolDefinition] = Nil
+
   /**
    * Add an individual Java or Scala source file to the index.
    *

@@ -242,8 +242,9 @@ class FolderTreeViewProvider(
     isBloop: () => Boolean,
     statistics: StatisticsConfig,
 ) {
-  private val classpath = new ClasspathSymbols(
-    isStatisticsEnabled = statistics.isTreeView
+  private val classpath = new IndexedSymbols(
+    definitionIndex,
+    isStatisticsEnabled = statistics.isTreeView,
   )
   private val isVisible = TrieMap.empty[String, Boolean].withDefaultValue(false)
   private val isCollapsed = TrieMap.empty[BuildTargetIdentifier, Boolean]
@@ -260,7 +261,7 @@ class FolderTreeViewProvider(
     _.toAbsolutePath,
     _.filename,
     _.toString,
-    () => buildTargets.allWorkspaceJars,
+    () => buildTargets.allSourceJars,
     (path, symbol) => classpath.symbols(path, symbol),
   )
 
@@ -281,10 +282,11 @@ class FolderTreeViewProvider(
       )
     },
     { (id, symbol) =>
+      // TODO use sources
       if (isBloop()) doCompile(id)
       buildTargets
-        .targetClassDirectories(id)
-        .flatMap(cd => classpath.symbols(cd.toAbsolutePath, symbol))
+        .buildTargetSources(id)
+        .flatMap(cd => classpath.symbols(cd, symbol))
         .iterator
     },
   )

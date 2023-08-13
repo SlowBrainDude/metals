@@ -62,6 +62,14 @@ final class OnDemandSymbolIndex(
         List.empty
     }
 
+  override def definitionsAt(
+      path: AbsolutePath,
+      dialect: Dialect
+  ): List[SymbolDefinition] = {
+    val bucket = getOrCreateBucket(dialect)
+    bucket.defintionsAt(path)
+  }
+
   override def addSourceDirectory(
       dir: AbsolutePath,
       dialect: Dialect
